@@ -1,0 +1,43 @@
+{
+    "manifestVersion": 1,
+    "id": "Hourglass",
+    "publisher": "Hourglass",
+    "version": "1.0.0",
+    "name": "Hourglass",
+    "description": "Gerenciamento de horas em tarefa.",
+    "public": false,
+    "categories": ["Code"],
+    "targets": [
+        {
+            "id": "Microsoft.VisualStudio.Services"
+        }
+    ],
+    "contributions": [
+        {
+            "id": "TaskWatcher",
+            "type": "ms.vss-web.hub",
+            "description": "Adds Watch Dog to the Work hub group",
+            "targets": [
+                "ms.vss-work-web.work-hub-group"
+            ],
+            "properties": {
+                "name": "Watch Dog",
+                "order": 99,
+                "uri": "index.html"
+            }
+        }
+    ],
+    "files":[
+        {
+            "path": "index.html",
+            "addressable": true
+        },
+        {
+            "path": "node_modules/vss-web-extension-sdk/lib",
+            "addressable": true,
+            "packagePath": "lib"
+        }
+    ],"scopes": [
+        "vso.work"
+    ]
+}
