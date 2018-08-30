@@ -1,0 +1,19 @@
+.grid{
+    left: 20px;
+}
+
+.titulo{
+    font-family: "Segoe UI VSS (Regular)","Segoe UI","-apple-system",BlinkMacSystemFont,Roboto,"Helvetica Neue",Helvetica,Ubuntu,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+    font-size: 19px;
+    padding: 11px;
+    margin-left: 3px;
+}
+
+#grid-container{
+    width: 100%;
+    height: 100%;
+}
+
+.hub-title{
+    margin-bottom: 30px;
+}

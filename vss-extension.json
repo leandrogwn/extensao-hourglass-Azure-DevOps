@@ -28,14 +28,17 @@
         {
             "id": "TaskWatcher",
             "type": "ms.vss-web.hub",
-            "description": "Adds Watch Dog to the Work hub group",
+            "description": "Hub para contagem de tempo",
             "targets": [
                 "ms.vss-work-web.work-hub-group"
             ],
             "properties": {
-                "name": "Watch Dog",
+                "name": "Gerir Tempo",
                 "order": 99,
                 "uri": "index.html"
+            },
+            "icons": {
+                "default": "images/logo16x16.png"
             }
         }
     ],
@@ -51,6 +54,10 @@
         },
         {
             "path": "images",
+            "addressable": true
+        },
+        {   
+            "path": "css",
             "addressable": true
         }
     ],"scopes": [
