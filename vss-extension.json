@@ -6,7 +6,10 @@
     "name": "Hourglass",
     "description": "Gerenciamento de tempo de execução de tarefas.",
     "public": false,
-    "categories": ["Plan and track","Test"],
+    "categories": [
+        "Plan and track",
+        "Test"
+    ],
     "targets": [
         {
             "id": "Microsoft.VisualStudio.Services"
@@ -19,7 +22,7 @@
         "details": {
             "path": "details.md"
         }
-    }, 
+    },
     "branding": {
         "color": "rgb(93, 67, 208)",
         "theme": "dark"
@@ -42,7 +45,7 @@
             }
         }
     ],
-    "files":[
+    "files": [
         {
             "path": "index.html",
             "addressable": true
@@ -56,11 +59,16 @@
             "path": "images",
             "addressable": true
         },
-        {   
+        {
             "path": "css",
             "addressable": true
+        },
+        {
+            "path": "script",
+            "addressable": true
         }
-    ],"scopes": [
+    ],
+    "scopes": [
         "vso.work"
     ]
 }
