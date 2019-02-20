@@ -2,13 +2,12 @@
     "manifestVersion": 1,
     "id": "Hourglass",
     "publisher": "Hourglass",
-    "version": "1.0.0",
+    "version": "1.0.3",
     "name": "Hourglass",
     "description": "Gerenciamento de tempo de execução de tarefas.",
     "public": false,
     "categories": [
-        "Plan and track",
-        "Test"
+        "Azure Test Plans"
     ],
     "targets": [
         {
@@ -18,6 +17,11 @@
     "icons": {
         "default": "images/logo128x128.png"
     },
+    "tags": [
+        "working",
+        "track",
+        "time management"
+    ],
     "content": {
         "details": {
             "path": "details.md"
@@ -69,6 +73,8 @@
         }
     ],
     "scopes": [
-        "vso.work"
+        "vso.profile",
+        "vso.work",
+        "vso.work_write"
     ]
 }

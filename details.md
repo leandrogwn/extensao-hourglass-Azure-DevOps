@@ -6,17 +6,90 @@ Essa extensão foi projetada para auxiliar o gerenciamento do uso do tempo do co
 
 Instruções para realizar a assinatura do item de trabalho a conta vinculada ao VSTS. 
 
-#### Work Item
+#### Hub Gerir Tempo
 
-![work-item](images/work-item.PNG)
+![menu](images/menu.png)
 
-#### Menu
+Dentro do Hub Board se encontra o Hub Gerir Tempo, ao selecionar essa opção sera carregado a listagem das tasks em progresso.
 
-![menu](images/menu-work-item.png)
+#### Listagem de Tasks
 
-## Tela de Assinatura
+![lista](images/lista.PNG)
 
-Nesta tela sera exibido algumas informações referentes ao item de trabalho onde o colaborador deve realizar a assinatura do item vinculando-a a sua conta integrada com o VSTS.
+A listagem exibe todas as Tasks que estiverem associadas ao e-mail do usuário logado e que estejam diferentes dos estados ('Closed','Completed','Resolved','Removed', 'Done', 'To Do').
 
-![details](images/tela-gerenciamento.png)
+Sera exibido informações relevantes a task como:
+- Código com link de edição direta da task
+- Título
+- Estado 
+- Projeto
+- Prioridade
+- Código com link de edição direta do PBI ao qual a task pertence
+- Botão para início da contagem de tempo da tarefa.
+
+Ao ser dado inicio a contagem de tempo será exibido as seguintes informação:
+- Código task e título
+- Link direto para editar task
+- Link para inserir observação ao tramite
+- Botão para parar a contagem do tempo da task selecionada.
+
+O tramite do tempo será feito ao clicar no botão responsável por parar a contagem do tempo, caso seja desejado inserir alguma informação, observação, comentário ao tramite, este deverá ser feito antes de parar a contagem.
+
+## Gerenciamento dos tramites
+
+Ao realizar o tramite do tempo de uma tarefa os dados são enviados a uma base externa, onde pode ser manipulada a partir do seguinte [link](http://hourglassazure.azurewebsites.net). Neste espaço sera apresentado todo tempo tramitado com a extensão Gerir Tempo disponível no Hub Board do Azure DevOps, inclua, edite ou remova tramites manualmente.
+
+#### Tela inicial
+
+![tela-inicial](images/tela-ha.PNG)
+
+Nesta tela sera possivel realizar o login ou registrar um novo usuário para os sistema de gerenciamento de tempo. Novos usuários devem ser registrados com o mesmo e-mail que utilizam no Azure DevOps, ex.(seu.nome@linx.com.br).
+
+#### Tela de login
+
+![tela-login](images/login.PNG)
+
+Tela para informar os dados para acesso ao sistema.
+
+#### Tela para registro de novo colaborador
+
+![tela-novo-registro](images/novo-colaborador.PNG)
+
+Tela para registrar um novo colaborador no sistema.
+
+#### Dashboard 
+
+![dashboard](images/dash.PNG)
+
+Nesta tela é exibido algumas informações relevantes ao usuário como:
+- Quantidade de tramites realizados pelo usuário
+- Quantidade de projetos em que os tramites estão envolvidos
+- Tempo tramitado durante o dia corrente
+- Tempo total tramitado pelo usuário
+
+No topo da tela tem o botão Tramite, responsável por abrir a tela de gerenciamento dos tramites.
+
+#### Gerenciamento dos tramites
+
+![tramite](images/gerir-tempo.PNG)
+
+Nesta tela é listado os tramites realizados, exibindo as seguintes informações:
+- Projeto 
+- Código da Task
+- Código do Pbi ao que a task esta vinculada
+- Título da Task
+- Hora de início
+- Hora final
+- Obs:
+- - ![manual](images/m.png)  Tramite manual
+- - ![manual](images/e.png)  Tramite editado
+- - ![manual](images/coment.png)  Tramite com comentário/observação
+- Botões de ação: Editar, Detalhes e excluir
+
+
+#### Configurações do usário
+
+![config-usuario](images/config-perfil.PNG)
+
+Nesta tela é possível alterar informações como e-mail do usuário e alterar senha.
 

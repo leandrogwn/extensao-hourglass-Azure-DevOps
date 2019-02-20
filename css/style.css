@@ -1,3 +1,7 @@
+html, body{
+    height: 100%;
+}
+
 .grid{
     left: 20px;
 }
@@ -16,4 +20,94 @@
 
 .hub-title{
     margin-bottom: 30px;
+}
+
+.btn{
+    /*background-color: rgba(0, 120, 212, 1);*/
+    color: #ffffff;
+    width: 100px;
+    height: 30px;
+}
+
+/*
+#btn:hover{
+    background-color: rgba(0, 90, 158, 1);
+}
+*/
+
+#info{
+    width: 100%;
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+#div-msg-info, #div-btn-stop, #div-stop-watch{
+    display: inline-block;
+}
+
+#div-msg-info{
+    width: 66%;
+}
+
+#div-stop-watch{
+    width: 16%;
+    font-size: 25px;
+    text-align: right;
+}
+#div-btn-stop{
+    text-align: center;
+    width: 16%;
+}
+
+blockquote {
+    margin-bottom: 0!important;
+}
+ 
+blockquote p {
+    font-size: 20px!important;
+    font-weight: bold!important;
+}
+
+blockquote small {
+    font-size: 15px!important;
+}
+
+.mygrid-wrapper-div {
+    overflow: auto;
+    height: 80%;
+}
+
+#insert-obs {
+   width: 100%;
+   text-align: left;
+   margin-top: -20px;
+   margin-left:120px;
+}
+
+#insert-obs a img{
+    width: 10px;
+}
+
+#obs {
+    display: none;
+    width: 100%;
+}
+
+#title-obs {
+    margin-top: 15px;
+}
+
+#close-obs {
+    margin-top:-15px;
+    margin-bottom:-15px;
+    text-align: right;
+}
+
+#textarea-obs {
+    border:none;
+    width:100%;
+    height:auto;
 }

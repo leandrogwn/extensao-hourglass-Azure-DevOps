@@ -1,17 +1,65 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 
 <head>
     <title>Gerir Tempo</title>
     <meta charset="utf-8">
+    <meta http-equiv="refresh" content="300000000">
     <script src="lib/VSS.SDK.js"></script>
     <link rel="stylesheet" href="css/style.css">
-    <script src="script/mainTask.js"></script>
+    <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <script src="script/moment.min.js"></script>
+    <script src="script/timer.js"></script>
+    <script>
+        function storageObs() {
+            var stoObs = document.getElementById("textarea-obs").value;
+            localStorage.setItem('obs', stoObs);
+        }
+    </script>
 </head>
 
-<body style="margin: 5px">
-    <div id="titulo" class="titulo"></div>
-    <div id="tabela" class="tabela"></div>
+<body style="margin: 5px;">
+    <div class="page-header" id="titulo">
+        <h1><small>Linx Time</small></h1>
+        <img src="images/lnr-funnel.png"><a href="http://hourglassazure.azurewebsites.net/" target="_blank">Meus tramites</a>
+    </div>
+    <div class="alert alert-success" id="info" style="display:none;">
+        <div id="div-msg-info">
+            <blockquote>
+                <p id="p-info"></p>
+                <div id="linkTask"></div>
+            </blockquote>
+        </div>
+        <div id="div-stop-watch">
+            <span id="span-time"></span>
+        </div>
+        <div id="div-btn-stop">
+            <button id="btn-stop-task" class="btn btn-danger bowtie-icon bowtie-stopwatch" onmouseover="storageObs()"></button>
+        </div>
+        <div id="insert-obs">
+            <a href="#" onclick="document.getElementById('obs').style.display='block';"><img src="images/down_icon.png">Inserir
+                observação</a>
+        </div>
+        <div id="obs">
+            <div id="title-obs">
+                <img src="images/information.png"> Comentário
+            </div>
+            <div id="close-obs">
+                <a href="#" onclick="document.getElementById('obs').style.display='none';">
+                    <img src="images/icone_fechar.png" title="Esconder o comentário">
+                </a>
+            </div>
+            <br>
+            <div>
+                <textarea name="textarea-obs" id="textarea-obs" autofocus="" placeholder="Adicione um comentário"></textarea>
+            </div>
+        </div>
+
+    </div>
+    <script src="script/mainTask.js"></script>
+    <div id="tabela" class="tabela mygrid-wrapper-div">
+
+    </div>
 </body>
 
 </html>
