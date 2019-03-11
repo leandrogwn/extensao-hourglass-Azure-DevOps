@@ -23,7 +23,7 @@ VSS.require([
       
       // Constante de consulta contendo a consulta WIQL
       var query = {
-        query: "SELECT [System.Id] FROM WorkItem WHERE [System.AssignedTo] = '" + userName + "'  AND [System.WorkItemType] = 'Task' AND [System.State] NOT IN ('Closed','Completed','Resolved','Removed', 'Done', 'To Do')"
+        query: "SELECT [System.Id] FROM WorkItem WHERE [System.AssignedTo] = '" + userName + "'  AND [System.WorkItemType] = 'Task' AND [System.State] NOT IN ('Closed','Completed','Resolved','Removed', 'Done', 'To Do', 'Aguardando Commit')"
       };
 
       // Exemplo url PBI https://linxfarma.visualstudio.com/web/wi.aspx?pcguid=c73370ed-b12c-46f8-be36-4d3323b1a831&id=502
@@ -38,6 +38,7 @@ VSS.require([
 
           witClient.getWorkItems(openWorkItems, null, null, _Contracts.WorkItemExpand.Relations).then(function (workItems) {
             var mwa = workItems.map(function (w) {
+              console.log(w);
               return [
                 w.fields["System.TeamProject"],
                 w.fields["System.IterationPath"],
@@ -147,16 +148,18 @@ VSS.require([
         btn.setAttribute("id", "btn_" + tarefa);
         btn.setAttribute("name", "btnHourglass");
         btn.setAttribute("class", "btn btn-success bowtie-icon bowtie-status-run");
-        btn.addEventListener("click", function () {
+        //btn.addEventListener("click", function () {
+        btn.onclick = function () {
           if (localStorage.getItem('tarefa') != null) {
             saveAzure();
+            updateEsforcoReal(localStorage.getItem('tarefa'));
             stopTimer();
             resetTitle();
             resetButtons();
           }
           storageTime(tarefa, titulo, codPbi, projeto, sprint, time);
           changeTitle(tarefa, titulo);
-        });
+        };
         return btn;
       }
 
@@ -197,78 +200,23 @@ VSS.require([
 
         // Cria div para o botão stop
         var btnStop = document.getElementById('btn-stop-task')
-        btnStop.addEventListener("click", function () {
+        //btnStop.addEventListener("click", function () {
+        btnStop.onclick = function () {
           saveAzure();
-          updateEsforcoReal(tarefa);
-          stopTimer();
           resetTitle();
           resetButtons();
-        });
+          stopTimer();
+        };
         startTimer();
         changeButton(tarefa);
       }
 
-      //Update Field Esforço real 
-      function updateEsforcoReal(tarefa){
-        // Gera matriz de todos os IDs de itens de trabalho abertos
-        var id = tarefa;
-        var hI = localStorage.getItem('horaInicio');
-        witClient.getWorkItem(id, ["Custom.LinxEsforcoReal"]).then(
-          function (workItem) {
-          if(workItem.fields["Custom.LinxEsforcoReal"] == null){
-            var esforcoAtual = 0;
-          }else{
-            var esforcoAtual = workItem.fields["Custom.LinxEsforcoReal"];
-          }
-          
-         
-          console.log("Esforço Atual: " + esforcoAtual);
-
-          var diferenca = tempoDecimal(hI, dateTimeNow());
-          
-          var esforcoReal = parseFloat(esforcoAtual) + parseFloat(diferenca);
-          
-          var retorno = esforcoReal.toFixed(2).split(".");
-          var esforcoReal = retorno[0] +","+ retorno[1];
-                
-          var update = [
-            {
-              "op": "add",
-              "path": "/fields/Custom.LinxEsforcoReal",
-              "value": esforcoReal
-            },
-            {
-              "op": "add",
-              "path": "/fields/System.History",
-              "value": "Adicionado "+diferenca +"h na tarefa "+ id +"."
-            }
-          ];
-  
-          try{
-            witClient.updateWorkItem(update, id).then((workItem) => {
-            console.log('WorkItem Updated: ' + workItem.id);
-            });
-          }catch(e) {
-            console.error('Work item (${workItem.id}) update error: ${e}')
-          }
-        });  
-      }
-
-      //Calcula diferença de tempo entre datas e retorna data convertida para decimal.
-      function tempoDecimal(dataInicial, dataFinal){
-        var dtFinal  = dataFinal;
-        var dtInicial = dataInicial;
-
-        var ms = moment(dtFinal,"YYYY-MM-DD HH:mm:ss").diff(moment(dtInicial,"YYYY-MM-DD HH:mm:ss"));
-        var d = moment.duration(ms);
-        var s = Math.floor(d.asHours());
-        return parseFloat(s) + parseFloat( (moment.utc(ms).format("mm")/60).toFixed(2));
-      }
-
-      // Grava informações com chamada de serviço
+       // Grava informações com chamada de serviço
       // Model Tramite
       // TramiteID,OrigemTramite,Email,Projeto,Pbi,Tarefa,Titulo,HoraInicio,HoraFim,Obs,TramiteEditado
       function saveAzure() {
+
+        var task = localStorage.getItem('tarefa');
 
         var sendInfo = {
           origemTramite: true,
@@ -300,8 +248,66 @@ VSS.require([
         }
 
         $.ajax(settings).done(function (response) {
+          updateEsforcoReal(task);
           console.log("Done: " + response);
         });
+      }
+
+      //Update Field Esforço real 
+      function updateEsforcoReal(tarefa){
+
+        var request = new XMLHttpRequest();
+
+        request.open("GET", "https://hourglassazure.azurewebsites.net/api/apitramites/timetask/" + tarefa + "/" + new Date().getTime());
+        request.setRequestHeader("Content-Type", "application/json");
+        request.setRequestHeader("cache-control", "no-cache");
+
+        request.onload = function () {
+        
+          var data = JSON.parse(this.response);
+          
+          if (request.status == 200) {
+            var tempoTotalTarefaPonto = data;
+            var tempoTotalTarefaVirgula = tempoTotalTarefaPonto.replace(".",",");
+
+            //var diferenca = tempoDecimal(horaInicial, dateTimeNow());
+            
+            var update = [
+              {
+                "op": "add",
+                "path": "/fields/Custom.LinxEsforcoReal",
+                "value": tempoTotalTarefaVirgula
+              },
+              {
+                "op": "add",
+                "path": "/fields/System.History",
+                "value": "Esforço real atualizado para "+ tempoTotalTarefaVirgula +"h."
+              }
+            ];
+            try{
+              witClient.updateWorkItem(update, tarefa).then(() => {
+              console.log('Work item atualizado');
+              });
+            }catch(e) {
+              console.error('Work item (${workItem.tarefa}) update error: ${e}')
+            }
+          } else {
+            console.log('error');
+          }
+        }
+        
+        request.send();
+      }
+
+      //Calcula diferença de tempo entre datas e retorna data convertida para decimal.
+      function tempoDecimal(dataInicial, dataFinal){
+        var dtFinal  = dataFinal;
+        var dtInicial = dataInicial;
+
+        var ms = moment(dtFinal,"YYYY-MM-DD HH:mm:ss").diff(moment(dtInicial,"YYYY-MM-DD HH:mm:ss"));
+        var d = moment.duration(ms);
+        var s = Math.floor(d.asHours());
+        return parseFloat(s) + parseFloat( (moment.utc(ms).format("mm")/60).toFixed(2));
       }
 
       // Criar formato Datetime
