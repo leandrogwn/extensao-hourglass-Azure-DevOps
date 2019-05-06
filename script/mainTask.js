@@ -11,351 +11,338 @@ VSS.require([
   "VSS/Authentication/Services"],
   function (VSS_Service, TFS_Wit_WebApi, _Contracts, AuthenticationService) {
     //organizar isso abaixo
-      var collectionUri = VSS.getWebContext().collection.uri;
-      var collectionId = VSS.getWebContext().collection.id;
-      var projectId = VSS.getWebContext().project.id;
-      var userName = VSS.getWebContext().user.name;
-      var userEmail = VSS.getWebContext().user.email;
-      uriTask = collectionUri + "web/wi.aspx?pcguid=" + collectionId + "&id=";
+    var collectionUri = VSS.getWebContext().collection.uri;
+    var collectionId = VSS.getWebContext().collection.id;
+    var projectId = VSS.getWebContext().project.id;
+    var userName = VSS.getWebContext().user.name;
+    var userEmail = VSS.getWebContext().user.email;
+    uriTask = collectionUri + "web/wi.aspx?pcguid=" + collectionId + "&id=";
 
-      // Recupera o cliente REST de Rastreamento de Item de Trabalho
-      var witClient = VSS_Service.getCollectionClient(TFS_Wit_WebApi.WorkItemTrackingHttpClient);
-      
-      // Constante de consulta contendo a consulta WIQL
-      var query = {
-        query: "SELECT [System.Id] FROM WorkItem WHERE [System.AssignedTo] = '" + userName + "'  AND [System.WorkItemType] = 'Task' AND [System.State] NOT IN ('Closed','Completed','Resolved','Removed', 'Done', 'To Do', 'Aguardando Commit')"
-      };
+    // Recupera o cliente REST de Rastreamento de Item de Trabalho
+    var witClient = VSS_Service.getCollectionClient(TFS_Wit_WebApi.WorkItemTrackingHttpClient);
 
-      // Exemplo url PBI https://linxfarma.visualstudio.com/web/wi.aspx?pcguid=c73370ed-b12c-46f8-be36-4d3323b1a831&id=502
-      //https://linxfarma.visualstudio.com/Softpharma%20-%20Sustenta%C3%A7%C3%A3o/_apis/wit/workitems?ids=188&$expand=relations&api-version=4.1
+    // Constante de consulta contendo a consulta WIQL
+    var query = {
+      query: "SELECT [System.Id] FROM WorkItem WHERE [System.AssignedTo] = '" + userName + "'  AND [System.WorkItemType] = 'Task' AND [System.State] NOT IN ('Closed','Completed','Resolved','Removed', 'Done', 'To Do', 'Aguardando Commit')"
+    };
 
-      // Executa a consulta WIQL no projeto ativo
-      witClient.queryByWiql(query, projectId).then(function (result) {
-        if (result.workItems.length > 0) {
+    // Exemplo url PBI https://linxfarma.visualstudio.com/web/wi.aspx?pcguid=c73370ed-b12c-46f8-be36-4d3323b1a831&id=502
+    //https://linxfarma.visualstudio.com/Softpharma%20-%20Sustenta%C3%A7%C3%A3o/_apis/wit/workitems?ids=188&$expand=relations&api-version=4.1
 
-          // Gera matriz de todos os IDs de itens de trabalho abertos
-          var openWorkItems = result.workItems.map(function (wi) { return wi.id });
+    // Executa a consulta WIQL no projeto ativo
+    witClient.queryByWiql(query, projectId).then(function (result) {
+      if (result.workItems.length > 0) {
 
-          witClient.getWorkItems(openWorkItems, null, null, _Contracts.WorkItemExpand.Relations).then(function (workItems) {
-            var mwa = workItems.map(function (w) {
-              console.log(w);
-              return [
-                w.fields["System.TeamProject"],
-                w.fields["System.IterationPath"],
-                w.relations["0"].url,
-                w.id,
-                w.fields["System.Title"],
-                w.fields["System.State"],
-                w.fields["System.AreaPath"],
-                w.fields["System.AssignedTo"]
-              ];
-            });
-            console.log(mwa);
-            mwa.unshift(["Projeto", "Sprint", "PBI", "Tarefa", "Titulo", "Estado","Time", ""]);  
-            tabela(mwa);
-            if (localStorage.tarefa) {
+        // Gera matriz de todos os IDs de itens de trabalho abertos
+        var openWorkItems = result.workItems.map(function (wi) { return wi.id });
+
+        witClient.getWorkItems(openWorkItems, null, null, _Contracts.WorkItemExpand.Relations).then(function (workItems) {
+          var mwa = workItems.map(function (w) {
+            return [
+              w.fields["System.TeamProject"],
+              w.fields["System.IterationPath"],
+              w.relations["0"].url,
+              w.id,
+              w.fields["System.Title"],
+              w.fields["System.State"],
+              w.fields["System.AreaPath"],
+              w.fields["Custom.Atividades"],
+              w.fields["Custom.Retrabalho"],
+              w.fields["System.AssignedTo"]
+            ];
+          });
+          mwa.unshift(["Projeto", "Sprint", "PBI", "Tarefa", "Titulo", "Estado", "Time", "Atividade", "Retrabalho"]);
+          tabela(mwa);
+          if (localStorage.tarefa) {
+            if (localStorage.getItem('situacao') == "Done") {
+              localStorage.clear();
+            } else {
               changeTitle(localStorage.getItem('tarefa'), localStorage.getItem('titulo'));
             }
-          });
-        } else {
-          document.getElementById("tabela").innerHTML = "Ola " + userName + ", você não possui tarefas em progresso atribuídas a sua conta VSTS.";
-        };
-        VSS.notifyLoadSucceeded();
-        
-      });
+          }
+        });
+      } else {
+        document.getElementById("tabela").innerHTML = "Ola " + userName + ", você não possui tarefas em progresso atribuídas a sua conta VSTS.";
+      };
+      VSS.notifyLoadSucceeded();
 
-      function tabela(conteudo) {
+    });
 
-        // Obter a referência para o corpo
-        var divTBody = document.getElementById("tabela");
+    function tabela(conteudo) {
 
-        // Cria um elemento <table> e um elemento <tbody>
-        var tbl = document.createElement("table");
-        tbl.setAttribute("class", "table table-hover");
-        var thead = document.createElement("thead");
-        var tblBody = document.createElement("tbody");
+      // Obter a referência para o corpo
+      var divTBody = document.getElementById("tabela");
 
-        var thd = function (i) { return (i == 0) ? "th" : "td"; };
+      // Cria um elemento <table> e um elemento <tbody>
+      var tbl = document.createElement("table");
+      tbl.setAttribute("class", "table table-hover");
+      var thead = document.createElement("thead");
+      var tblBody = document.createElement("tbody");
 
-        // Criando todas as células
-        for (var j = 0; j < conteudo.length; j++) {
+      var thd = function (i) { return (i == 0) ? "th" : "td"; };
 
-          // Cria uma linha na tabela
-          var row = document.createElement("tr");
+      // Criando todas as células
+      for (var j = 0; j < conteudo.length; j++) {
 
-          for (var i = 0; i < conteudo[j].length; i++) {
+        // Cria uma linha na tabela
+        var row = document.createElement("tr");
 
-            // Cria elemento th ou td
-            var cell = document.createElement(thd(j));
+        for (var i = 0; i < conteudo[j].length; i++) {
 
-            // Valida tipo de informação e trata conforme o necessário
-            // j == 0 -> Cabeçalho tabela
-            // i == 0 -> Coluna id task
-            // i == 5 -> Coluna id pbi
-            // i == 7 -> Coluna botão task
-            if (i == 3 && j > 0) {
-              var cellText = linkTask(uriTask + conteudo[j][i], conteudo[j][i]);
-            } else if (i == 2 && j > 0) {
-              var codPbi = getLastCodUrl(conteudo[j][2]);
-              var linkPbi = collectionUri + "web/wi.aspx?pcguid=" + collectionId + "&id=" + codPbi;
-              var cellText = linkTask(linkPbi, codPbi);
-            }else if (i == 1 && j > 0){
-              var codSprt = getSprint(conteudo[j][1])
-              var cellText = document.createTextNode(codSprt);
-            }else if (i == 6 && j > 0){
-              var time = getSprint(conteudo[j][6])
-              var cellText = document.createTextNode(time);
-            }else if (i == 7 && j > 0) {
-              var codPbii = getLastCodUrl(conteudo[j][2]);
-              var codSprt = getSprint(conteudo[j][1])
-              var cellText = createButton(conteudo[j][3], conteudo[j][4], codPbii, conteudo[j][0], codSprt, conteudo[j][6]);
-            } else {
-              var cellText = document.createTextNode(conteudo[j][i]);
-            }
+          // Cria elemento th ou td
+          var cell = document.createElement(thd(j));
 
-            // Acrescenta conteúdo a celula da tabela
-            cell.appendChild(cellText);
-            row.appendChild(cell);
+          // Valida tipo de informação e trata conforme o necessário
+          // j == 0 -> Cabeçalho tabela
+          // i == 0 -> Coluna id task
+          // i == 5 -> Coluna id pbi
+          // i == 7 -> Coluna botão task
+          if (i == 3 && j > 0) {
+            var cellText = linkTask(uriTask + conteudo[j][i], conteudo[j][i]);
+          } else if (i == 2 && j > 0) {
+            var codPbi = getLastCodUrl(conteudo[j][2]);
+            var linkPbi = collectionUri + "web/wi.aspx?pcguid=" + collectionId + "&id=" + codPbi;
+            var cellText = linkTask(linkPbi, codPbi);
+          } else if (i == 1 && j > 0) {
+            var codSprt = getSprint(conteudo[j][1])
+            var cellText = document.createTextNode(codSprt);
+          } else if (i == 6 && j > 0) {
+            var time = getSprint(conteudo[j][6])
+            var cellText = document.createTextNode(time);
+          } else if (i == 9 && j > 0) {
+            var codPbii = getLastCodUrl(conteudo[j][2]);
+            var codSprt = getSprint(conteudo[j][1])
+            var timeDB = getSprint(conteudo[j][6])
+            var cellText = createButton(conteudo[j][3], conteudo[j][4], codPbii, conteudo[j][0], codSprt, timeDB, conteudo[j][7], conteudo[j][8], conteudo[j][5]);
+          } else {
+            var cellText = document.createTextNode(conteudo[j][i]);
           }
 
-          // Acrescenta linha ao final do corpo da tabela
-          (j == 0) ? thead.appendChild(row) : tblBody.appendChild(row);
+          // Acrescenta conteúdo a celula da tabela
+          cell.appendChild(cellText);
+          row.appendChild(cell);
         }
 
-        // Acrescenta o <thead / tbody> no <table>
-        tbl.appendChild(thead);
-        tbl.appendChild(tblBody);
-
-        // Acrescenta <table> em <body>
-        divTBody.appendChild(tbl);
+        // Acrescenta linha ao final do corpo da tabela
+        (j == 0) ? thead.appendChild(row) : tblBody.appendChild(row);
       }
 
-      function getLastCodUrl(url) {
-        var urlIndex = url.lastIndexOf("/");
-        var codPbi = url.substring(urlIndex + 1);
-        return codPbi;
-      }
+      // Acrescenta o <thead / tbody> no <table>
+      tbl.appendChild(thead);
+      tbl.appendChild(tblBody);
 
-      function getSprint(sprint) {
-        var sprt = sprint.lastIndexOf("\\");
-        var codSprint = sprint.substring(sprt + 1);
-        return codSprint;
-      }
+      // Acrescenta <table> em <body>
+      divTBody.appendChild(tbl);
+    }
 
-      // Criar botao recebendo cod tarefa e titulo
-      function createButton(tarefa, titulo, codPbi, projeto, sprint, time) {
-        var btn = document.createElement("button");
-        btn.setAttribute("id", "btn_" + tarefa);
-        btn.setAttribute("name", "btnHourglass");
-        btn.setAttribute("class", "btn btn-success bowtie-icon bowtie-status-run");
-        //btn.addEventListener("click", function () {
-        btn.onclick = function () {
-          if (localStorage.getItem('tarefa') != null) {
-            saveAzure();
-            updateEsforcoReal(localStorage.getItem('tarefa'));
-            stopTimer();
-            resetTitle();
-            resetButtons();
-          }
-          storageTime(tarefa, titulo, codPbi, projeto, sprint, time);
-          changeTitle(tarefa, titulo);
-        };
-        return btn;
-      }
+    function getLastCodUrl(url) {
+      var urlIndex = url.lastIndexOf("/");
+      var codPbi = url.substring(urlIndex + 1);
+      return codPbi;
+    }
 
-      // Converter ISO para Date / Não ta sendo usado
-      // 2018-10-10T19:12:18.51Z -> 10/10/2018
-      function formatDate(str) {
-        var date = moment(str);
-        var dateComponent = date.utc().format('DD/MM/YYYY HH:mm');
-        return dateComponent;
-      }
+    function getSprint(sprint) {
+      var sprt = sprint.lastIndexOf("\\");
+      var codSprint = sprint.substring(sprt + 1);
+      return codSprint;
+    }
 
-      // Oculta info e tira texto
-      function resetTitle() {
-        document.getElementById("info").style = "display:none;";
-        document.getElementById("p-info").innerHTML = "";
-        document.getElementById("linkTask").innerHTML = "";
-      }
-
-      // Grava informação locais no navegador
-      function storageTime(tarefa, titulo, codPbi, projeto, sprint, time) {
-        localStorage.setItem("tarefa", tarefa);
-        localStorage.setItem("titulo", titulo);
-        localStorage.setItem("codPbi", codPbi);
-        localStorage.setItem("projeto", projeto);
-        localStorage.setItem("sprint", sprint);
-        localStorage.setItem("horaInicio", dateTimeNow());
-        localStorage.setItem("time", time);
-      }
-
-      // Altera titulo e cria botão de acordo com a task selecionada
-      function changeTitle(tarefa, titulo) {
-        var lt = uriTask + tarefa;
-
-        document.getElementById("info").style = "display:flex-inline;";
-        document.getElementById("p-info").innerHTML = tarefa + " - " + titulo;
-
-        document.getElementById("linkTask").appendChild(linkTask(lt, "Abrir TASK " + tarefa));
-
-        // Cria div para o botão stop
-        var btnStop = document.getElementById('btn-stop-task')
-        //btnStop.addEventListener("click", function () {
-        btnStop.onclick = function () {
+    // Criar botao recebendo cod tarefa e titulo
+    function createButton(tarefa, titulo, codPbi, projeto, sprint, timeDB, atividade, retrabalho, situacao) {
+      var btn = document.createElement("button");
+      btn.setAttribute("id", "btn_" + tarefa);
+      btn.setAttribute("name", "btnHourglass");
+      btn.setAttribute("class", "btn btn-success bowtie-icon bowtie-status-run");
+      btn.onclick = function () {
+        if (localStorage.getItem('tarefa') != null) {
           saveAzure();
+          updateEsforcoReal(localStorage.getItem('tarefa'));
+          stopTimer();
           resetTitle();
           resetButtons();
-          stopTimer();
-        };
-        startTimer();
-        changeButton(tarefa);
-      }
-
-       // Grava informações com chamada de serviço
-      // Model Tramite
-      // TramiteID,OrigemTramite,Email,Projeto,Pbi,Tarefa,Titulo,HoraInicio,HoraFim,Obs,TramiteEditado
-      function saveAzure() {
-
-        var task = localStorage.getItem('tarefa');
-
-        var sendInfo = {
-          origemTramite: true,
-          tramiteEditado: false,
-          time: localStorage.getItem('time'),
-          email: userEmail,
-          projeto: localStorage.getItem('projeto'),
-          sprint: localStorage.getItem('sprint'),
-          pbi: localStorage.getItem('codPbi'),
-          tarefa: localStorage.getItem('tarefa'),
-          titulo: localStorage.getItem('titulo'),
-          horaInicio: localStorage.getItem('horaInicio'),
-          horaFim: dateTimeNow(),
-          obs: localStorage.getItem('obs')
         }
+        storageTime(tarefa, titulo, codPbi, projeto, sprint, timeDB, atividade, retrabalho, situacao);
+        changeTitle(tarefa, titulo);
+      };
+      return btn;
+    }
 
-        var settings = {
-          "async": true,
-          "crossDomain": true,
-          "url": "https://hourglassazure.azurewebsites.net/api/apitramites",
-          "type": "POST",
-          "headers": {
-            "cache-control": "max-age=0"
-          },
-          "processData": false,
-          "contentType": "application/json; charset=utf-8", 
-          "dataType": "json", 
-          "data": JSON.stringify(sendInfo)
-        }
+    // Oculta info e tira texto
+    function resetTitle() {
+      document.getElementById("info").style = "display:none;";
+      document.getElementById("p-info").innerHTML = "";
+      document.getElementById("linkTask").innerHTML = "";
+    }
 
-        $.ajax(settings).done(function (response) {
-          updateEsforcoReal(task);
-          console.log("Done: " + response);
-        });
-      }
+    // Grava informação locais no navegador
+    function storageTime(tarefa, titulo, codPbi, projeto, sprint, time, atividade, retrabalho, situacao) {
+      localStorage.setItem("tarefa", tarefa);
+      localStorage.setItem("titulo", titulo);
+      localStorage.setItem("codPbi", codPbi);
+      localStorage.setItem("projeto", projeto);
+      localStorage.setItem("sprint", sprint);
+      localStorage.setItem("horaInicio", dateTimeNow());
+      localStorage.setItem("time", time);
+      localStorage.setItem("atividade", atividade);
+      localStorage.setItem("retrabalho", retrabalho);
+      localStorage.setItem("situacao", situacao);
+    }
 
-      //Update Field Esforço real 
-      function updateEsforcoReal(tarefa){
+    // Altera titulo e cria botão de acordo com a task selecionada
+    function changeTitle(tarefa, titulo) {
+      var lt = uriTask + tarefa;
 
-        var request = new XMLHttpRequest();
+      document.getElementById("info").style = "display:flex-inline;";
+      document.getElementById("p-info").innerHTML = tarefa + " - " + titulo;
 
-        request.open("GET", "https://hourglassazure.azurewebsites.net/api/apitramites/timetask/" + tarefa + "/" + new Date().getTime());
-        request.setRequestHeader("Content-Type", "application/json");
-        request.setRequestHeader("cache-control", "no-cache");
+      document.getElementById("linkTask").appendChild(linkTask(lt, "Abrir TASK " + tarefa));
 
-        request.onload = function () {
-        
-          var data = JSON.parse(this.response);
-          
-          if (request.status == 200) {
-            var tempoTotalTarefaPonto = data;
-            var tempoTotalTarefaVirgula = tempoTotalTarefaPonto.replace(".",",");
-
-            //var diferenca = tempoDecimal(horaInicial, dateTimeNow());
-            
-            var update = [
-              {
-                "op": "add",
-                "path": "/fields/Custom.LinxEsforcoReal",
-                "value": tempoTotalTarefaVirgula
-              },
-              {
-                "op": "add",
-                "path": "/fields/System.History",
-                "value": "Esforço real atualizado para "+ tempoTotalTarefaVirgula +"h."
-              }
-            ];
-            try{
-              witClient.updateWorkItem(update, tarefa).then(() => {
-              console.log('Work item atualizado');
-              });
-            }catch(e) {
-              console.error('Work item (${workItem.tarefa}) update error: ${e}')
-            }
-          } else {
-            console.log('error');
-          }
-        }
-        
-        request.send();
-      }
-
-      //Calcula diferença de tempo entre datas e retorna data convertida para decimal.
-      function tempoDecimal(dataInicial, dataFinal){
-        var dtFinal  = dataFinal;
-        var dtInicial = dataInicial;
-
-        var ms = moment(dtFinal,"YYYY-MM-DD HH:mm:ss").diff(moment(dtInicial,"YYYY-MM-DD HH:mm:ss"));
-        var d = moment.duration(ms);
-        var s = Math.floor(d.asHours());
-        return parseFloat(s) + parseFloat( (moment.utc(ms).format("mm")/60).toFixed(2));
-      }
-
-      // Criar formato Datetime
-      function dateTimeNow() {
-        var date = new Date();
-
-        var hours = date.getHours();
-        hours = hours < 10 ? '0' + hours : hours;
-
-        var minutes = date.getMinutes();
-        minutes = minutes < 10 ? '0' + minutes : minutes;
-
-        var seconds = date.getSeconds();
-        seconds = seconds < 10 ? '0' + seconds : seconds;
-
-        var strTime = hours + ':' + minutes + ':' + seconds;
-
-        var dia = date.getDate();
-        dia = dia < 10 ? '0' + dia : dia;
-
-        var mes = date.getMonth() + 1;
-        mes = mes < 10 ? '0' + mes : mes;
-        return date.getFullYear() + "-" + mes + "-" + dia  + "T" + strTime;
-      }
-
-      // Cria link para o código da task ou pbi
-      function linkTask(lt, text) {
-        var linkTask = document.createElement("a", text);
-        linkTask.setAttribute("href", lt);
-        linkTask.setAttribute("target", "_top");
-        textoTask = document.createTextNode(text);
-        linkTask.appendChild(textoTask);
-        return linkTask;
-      }
-
-      // Reseta todos os botões das tasks e altera o da task selecionada como inativo
-      function changeButton(tarefa) {
+      // Cria div para o botão stop
+      var btnStop = document.getElementById('btn-stop-task')
+      btnStop.onclick = function () {
+        saveAzure();
+        resetTitle();
         resetButtons();
-        document.getElementById("btn_" + tarefa).className = "btn bowtie-icon bowtie-file-type-coffeescript";
-        document.getElementById('btn_' + tarefa).disabled = true;
+        stopTimer();
+      };
+      startTimer();
+      changeButton(tarefa);
+    }
+
+    // Grava informações com chamada de serviço
+    // Model Tramite
+    // TramiteID,OrigemTramite,Email,Projeto,Pbi,Tarefa,Titulo,HoraInicio,HoraFim,Obs,TramiteEditado
+    function saveAzure() {
+
+      var task = localStorage.getItem('tarefa');
+
+      var sendInfo = {
+        origemTramite: true,
+        tramiteEditado: false,
+        time: localStorage.getItem('time'),
+        atividade: localStorage.getItem('atividade'),
+        retrabalho: localStorage.getItem('retrabalho'),
+        email: userEmail,
+        projeto: localStorage.getItem('projeto'),
+        sprint: localStorage.getItem('sprint'),
+        pbi: localStorage.getItem('codPbi'),
+        tarefa: localStorage.getItem('tarefa'),
+        titulo: localStorage.getItem('titulo'),
+        horaInicio: localStorage.getItem('horaInicio'),
+        horaFim: dateTimeNow(),
+        obs: localStorage.getItem('obs')
       }
 
-      // Reseta todos os botões das tasks e altera todos como ativo
-      function resetButtons() {
-        var a = document.getElementsByName("btnHourglass");
-        for (var i = 0; i < a.length; i++) {
-          a[i].className = "btn btn-success bowtie-icon bowtie-status-run";
-          a[i].removeAttribute("disabled");
+      var settings = {
+        "async": true,
+        "crossDomain": true,
+        "url": "https://hourglassazure.azurewebsites.net/api/apitramites",
+        "type": "POST",
+        "headers": {
+          "cache-control": "max-age=0"
+        },
+        "processData": false,
+        "contentType": "application/json; charset=utf-8",
+        "dataType": "json",
+        "data": JSON.stringify(sendInfo)
+      }
+
+      $.ajax(settings).done(function (response) {
+        updateEsforcoReal(task);
+      });
+    }
+
+    //Update Field Esforço real 
+    function updateEsforcoReal(tarefa) {
+
+      var request = new XMLHttpRequest();
+
+      //var observa = localStorage.getItem('obs');
+
+      request.open("GET", "https://hourglassazure.azurewebsites.net/api/apitramites/timetask/" + tarefa + "/" + new Date().getTime());
+      request.setRequestHeader("Content-Type", "application/json");
+      request.setRequestHeader("cache-control", "no-cache");
+
+      request.onload = function () {
+
+        var data = JSON.parse(this.response);
+
+        if (request.status == 200) {
+          var tempoTotalTarefaPonto = data;
+          var tempoTotalTarefaVirgula = tempoTotalTarefaPonto.replace(".", ",");
+
+          var update = [
+            {
+              "op": "add",
+              "path": "/fields/Custom.LinxEsforcoReal",
+              "value": tempoTotalTarefaVirgula
+            },
+            {
+              "op": "add",
+              "path": "/fields/System.History",
+              "value": " Esforço real atualizado para " + tempoTotalTarefaVirgula + "h. "
+            }
+          ];
+          try {
+            witClient.updateWorkItem(update, tarefa).then(() => {
+            });
+          } catch (e) {
+            console.error('Work item (${workItem.tarefa}) update error: ${e}')
+          }
+        } else {
+          console.log('error');
         }
       }
+
+      request.send();
+    }
+
+    // Criar formato Datetime
+    function dateTimeNow() {
+      var date = new Date();
+
+      var hours = date.getHours();
+      hours = hours < 10 ? '0' + hours : hours;
+
+      var minutes = date.getMinutes();
+      minutes = minutes < 10 ? '0' + minutes : minutes;
+
+      var seconds = date.getSeconds();
+      seconds = seconds < 10 ? '0' + seconds : seconds;
+
+      var strTime = hours + ':' + minutes + ':' + seconds;
+
+      var dia = date.getDate();
+      dia = dia < 10 ? '0' + dia : dia;
+
+      var mes = date.getMonth() + 1;
+      mes = mes < 10 ? '0' + mes : mes;
+      return date.getFullYear() + "-" + mes + "-" + dia + "T" + strTime;
+    }
+
+    // Cria link para o código da task ou pbi
+    function linkTask(lt, text) {
+      var linkTask = document.createElement("a", text);
+      linkTask.setAttribute("href", lt);
+      linkTask.setAttribute("target", "_top");
+      textoTask = document.createTextNode(text);
+      linkTask.appendChild(textoTask);
+      return linkTask;
+    }
+
+    // Reseta todos os botões das tasks e altera o da task selecionada como inativo
+    function changeButton(tarefa) {
+      resetButtons();
+      document.getElementById("btn_" + tarefa).className = "btn bowtie-icon bowtie-file-type-coffeescript";
+      document.getElementById('btn_' + tarefa).disabled = true;
+    }
+
+    // Reseta todos os botões das tasks e altera todos como ativo
+    function resetButtons() {
+      var a = document.getElementsByName("btnHourglass");
+      for (var i = 0; i < a.length; i++) {
+        a[i].className = "btn btn-success bowtie-icon bowtie-status-run";
+        a[i].removeAttribute("disabled");
+      }
+    }
   });

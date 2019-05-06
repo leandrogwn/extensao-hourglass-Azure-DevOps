@@ -14,14 +14,7 @@ function stopTimer() {
 
 function reset() {
   clearInterval(timer);
-  localStorage.removeItem('startTime');
-  localStorage.removeItem('tarefa');
-  localStorage.removeItem('titulo');
-  localStorage.removeItem('codPbi');
-  localStorage.removeItem('projeto');
-  localStorage.removeItem('sprint');
-  localStorage.removeItem('horaInicio');
-  localStorage.removeItem('time');
+  localStorage.clear();
 }
 
 function clockTick() {
