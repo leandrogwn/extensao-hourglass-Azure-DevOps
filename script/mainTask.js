@@ -36,6 +36,15 @@ VSS.require([
         // Gera matriz de todos os IDs de itens de trabalho abertos
         var openWorkItems = result.workItems.map(function (wi) { return wi.id });
 
+        if (localStorage.getItem("tarefa") !== null) {
+          var a = parseInt(localStorage.getItem("tarefa"));
+            if(openWorkItems.lastIndexOf(a) === -1){
+              resetTitle();
+              resetButtons();
+              stopTimer();
+            }
+        }
+
         witClient.getWorkItems(openWorkItems, null, null, _Contracts.WorkItemExpand.Relations).then(function (workItems) {
           var mwa = workItems.map(function (w) {
             return [
@@ -62,6 +71,11 @@ VSS.require([
           }
         });
       } else {
+        if (localStorage.getItem("tarefa") !== null) {
+          resetTitle();
+          resetButtons();
+          stopTimer();
+        }
         document.getElementById("tabela").innerHTML = "Ola " + userName + ", você não possui tarefas em progresso atribuídas a sua conta VSTS.";
       };
       VSS.notifyLoadSucceeded();
@@ -69,6 +83,9 @@ VSS.require([
     });
 
     function tabela(conteudo) {
+      
+
+
 
       // Obter a referência para o corpo
       var divTBody = document.getElementById("tabela");
