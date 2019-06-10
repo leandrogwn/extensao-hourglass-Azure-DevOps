@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "id": "Hourglass",
     "publisher": "Hourglass",
-    "version": "1.7.7",
+    "version": "1.7.9",
     "name": "Hourglass",
     "description": "Gerenciamento de tempo de execução de tarefas.",
     "public": false,

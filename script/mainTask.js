@@ -286,7 +286,7 @@ VSS.require([
 
         if (request.status == 200) {
           var tempoTotalTarefaPonto = data;
-          var tempoTotalTarefaVirgula = tempoTotalTarefaPonto.replace(".", ",");
+          var tempoTotalTarefaVirgula = tempoTotalTarefaPonto.toString().replace(".", ",");
 
           var update = [
             {
@@ -310,14 +310,13 @@ VSS.require([
           console.log('error');
         }
       }
-
       request.send();
     }
 
     // Criar formato Datetime
     function dateTimeNow() {
       var date = new Date();
-
+      
       var hours = date.getHours();
       hours = hours < 10 ? '0' + hours : hours;
 
