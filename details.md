@@ -10,7 +10,7 @@ Instruções para realizar a assinatura do item de trabalho a conta vinculada ao
 
 ![menu](images/menu.png)
 
-Dentro do Hub Board se encontra o Hub Gerir Tempo, ao selecionar essa opção sera carregado a listagem das tasks em progresso.
+Dentro do Hub Board se encontra o Hub Gerir Tempo, ao selecionar essa opção será carregado a listagem das tasks em progresso.
 
 #### Listagem de Tasks
 
@@ -18,7 +18,7 @@ Dentro do Hub Board se encontra o Hub Gerir Tempo, ao selecionar essa opção se
 
 A listagem exibe todas as Tasks que estiverem associadas ao e-mail do usuário logado e que estejam diferentes dos estados ('Closed','Completed','Resolved','Removed', 'Done', 'To Do').
 
-Sera exibido informações relevantes a task como:
+Será exibido informações relevantes a task como:
 - Código com link de edição direta da task
 - Título
 - Estado 
