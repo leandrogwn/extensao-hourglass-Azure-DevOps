@@ -1,6 +1,6 @@
 # Hourglass
 
-Essa extensão foi projetada para auxiliar o gerenciamento do uso do tempo do colaborador em cada item de trabalho do projeto.  
+Essa extensão foi projetada para auxiliar o gerenciamento do uso do tempo do colaborador em cada item de trabalho de um projeto presente na Azure DevOps.  
 
 [Saiba mais](https://www.linx.com.br) sobre a corporação.
 
