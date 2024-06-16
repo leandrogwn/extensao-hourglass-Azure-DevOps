@@ -41,11 +41,13 @@ Ao ser dado início a contagem de tempo, será exibido as seguintes informaçõe
 
 O tramite do tempo será feito ao clicar no botão responsável por parar a contagem do tempo, caso seja desejado inserir alguma informação, observação, comentário ao tramite, este deverá ser feito antes de parar a contagem.
 
-Caso o usuário entre no Azure DevOps e mude o estado de uma tarefa "In Progress" para "Done" sem antes ter parado o tempo no Gerir Tempo, o tempo não finalizado sera perdido, necessitando ser incluído manualmente pelo usuário no [Gerenciador de Tramites](http://hourglassazure.azurewebsites.net).
+Caso o usuário entre no Azure DevOps e mude o estado de uma tarefa "In Progress" para "Done" sem antes ter parado o tempo no Gerir Tempo, o tempo não finalizado sera perdido, necessitando ser incluído manualmente pelo usuário no [Gerenciador de Tramites](https://github.com/leandrogwn/gerir-tempo-hourglass).
 
 ## Gerenciamento dos tramites
 
-Ao realizar o tramite do tempo de uma tarefa os dados são enviados a uma base externa, onde pode ser manipulada a partir do seguinte [link](http://hourglassazure.azurewebsites.net). Neste espaço sera apresentado todo tempo tramitado com a extensão Gerir Tempo disponível no Hub Board do Azure DevOps, neste espaço é possível, incluir, editar ou remover tramites manualmente.
+Ao realizar o tramite do tempo de uma tarefa os dados são enviados a uma base externa, onde pode ser manipulado. Neste espaço sera apresentado todo tempo tramitado com a extensão Gerir Tempo disponível no Hub Board do Azure DevOps, neste espaço é possível, incluir, editar ou remover tramites manualmente.
+
+Link do repositório do projeto [link](https://github.com/leandrogwn/gerir-tempo-hourglass)
 
 #### Tela inicial
 
