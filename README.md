@@ -47,7 +47,7 @@ Caso o usuário entre no Azure DevOps e mude o estado de uma tarefa "In Progress
 
 Ao realizar o tramite do tempo de uma tarefa os dados são enviados a uma base externa, onde pode ser manipulado. Neste espaço sera apresentado todo tempo tramitado com a extensão Gerir Tempo disponível no Hub Board do Azure DevOps, neste espaço é possível, incluir, editar ou remover tramites manualmente.
 
-Link do repositório do projeto [link](https://github.com/leandrogwn/gerir-tempo-hourglass)
+[Link do repositório do projeto](https://github.com/leandrogwn/gerir-tempo-hourglass)
 
 #### Tela inicial
 
